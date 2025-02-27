@@ -6,6 +6,10 @@ export const REDLINE_RPM = 7000;
 export const MAX_SPEED_MPH = 220;
 export const GEAR_RATIOS = [0, 3.5, 2.5, 1.8, 1.3, 1.1, 0.8]; // Neutral + 6 gears
 
+// Dynamometer Constants
+export const MAX_TORQUE = 500; // Nm
+export const MAX_POWER = 450; // HP
+
 // Sound simulation
 export const SOUND_FILES = {
   idle: '/sounds/v8-idle.mp3',       // Placeholder URLs
@@ -30,4 +34,5 @@ export const KEY_BINDINGS = {
   ENGINE_START: 'p',
   ENGINE_STOP: 'f',
   NEUTRAL: 'n',
+  TOGGLE_DYNO: 'k',
 };

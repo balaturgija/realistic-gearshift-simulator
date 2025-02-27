@@ -112,7 +112,7 @@
   }
   
   .gauge-container {
-    @apply relative w-full max-w-[240px] aspect-square rounded-full bg-dashboard-gauge-bg border-4 border-dashboard-panel overflow-hidden shadow-inner;
+    @apply relative w-full max-w-[240px] aspect-square rounded-full overflow-hidden shadow-md;
   }
   
   .gauge-ticks {
@@ -132,7 +132,7 @@
   }
   
   .gauge-value {
-    @apply absolute inset-0 flex items-center justify-center text-xl font-medium;
+    @apply absolute inset-0 flex flex-col items-center justify-center;
   }
   
   .gauge-label {

@@ -5,6 +5,7 @@ import { RPMGauge } from './RPMGauge';
 import { SpeedGauge } from './SpeedGauge';
 import { GearShifter } from './GearShifter';
 import { PerformanceMonitor } from './PerformanceMonitor';
+import { Dynamometer } from './Dynamometer';
 import { ENGINE_MAX_RPM, KEY_BINDINGS } from '@/lib/constants';
 
 export function Dashboard() {
@@ -15,10 +16,14 @@ export function Dashboard() {
     gear,
     throttle,
     reachedRedline,
+    torque,
+    horsepower,
+    isDynoEnabled,
     startEngine,
     stopEngine,
     shiftToGear,
-    applyThrottle
+    applyThrottle,
+    toggleDyno
   } = useEngine();
 
   const { frequencies, fps } = useSound({
@@ -37,12 +42,17 @@ export function Dashboard() {
       {/* Dashboard - Main content takes most of the space */}
       <div className="grid grid-cols-1 md:grid-cols-2 gap-4 mb-4 flex-grow">
         <div className="dash-panel flex items-center justify-center">
-          <RPMGauge rpm={rpm} reachedRedline={reachedRedline} />
-        </div>
-        <div className="dash-panel flex items-center justify-center">
           <SpeedGauge speed={speed} />
         </div>
+        <div className="dash-panel flex items-center justify-center">
+          <RPMGauge rpm={rpm} reachedRedline={reachedRedline} />
+        </div>
       </div>
+      
+      {/* Dynamometer - Only shown when enabled */}
+      {isDynoEnabled && (
+        <Dynamometer speed={speed} torque={torque} horsepower={horsepower} />
+      )}
       
       {/* Controls & Gear shifter - Taking less space */}
       <div className="grid grid-cols-1 md:grid-cols-3 gap-4 mb-4">
@@ -75,6 +85,17 @@ export function Dashboard() {
               <span className="text-base sm:text-lg font-semibold">Apply Throttle</span>
             </button>
           </div>
+          
+          <div className="mt-4">
+            <button 
+              className={`w-full py-3 px-4 flex items-center justify-center rounded-lg hover:bg-opacity-80 transition-colors duration-200 ${isDynoEnabled ? 'bg-green-600 text-white' : 'bg-gray-600 text-white'}`}
+              onClick={toggleDyno}
+            >
+              <span className="text-base sm:text-lg font-semibold">
+                Dynamometer: {isDynoEnabled ? 'ON' : 'OFF'}
+              </span>
+            </button>
+          </div>
         </div>
         
         <div className="md:col-span-2">
@@ -97,7 +118,7 @@ export function Dashboard() {
       {/* Keyboard controls guide */}
       <div className="controls-hint animate-fade-in text-xs sm:text-sm">
         <h3 className="font-medium mb-1">Keyboard Controls:</h3>
-        <div className="grid grid-cols-2 sm:grid-cols-3 gap-2">
+        <div className="grid grid-cols-2 sm:grid-cols-4 gap-2">
           <div className="flex items-center">
             <span className="key-command">{KEY_BINDINGS.THROTTLE.toUpperCase()}</span>
             <span className="ml-2">Increase gas</span>
@@ -121,6 +142,10 @@ export function Dashboard() {
           <div className="flex items-center">
             <span className="key-command">{KEY_BINDINGS.NEUTRAL.toUpperCase()}</span>
             <span className="ml-2">Shift to neutral</span>
+          </div>
+          <div className="flex items-center">
+            <span className="key-command">{KEY_BINDINGS.TOGGLE_DYNO.toUpperCase()}</span>
+            <span className="ml-2">Toggle dyno</span>
           </div>
         </div>
       </div>

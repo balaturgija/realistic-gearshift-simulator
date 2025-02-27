@@ -7,7 +7,9 @@ import {
   REDLINE_RPM, 
   MAX_SPEED_MPH, 
   GEAR_RATIOS, 
-  KEY_BINDINGS 
+  KEY_BINDINGS,
+  MAX_TORQUE,
+  MAX_POWER
 } from '@/lib/constants';
 
 interface EngineState {
@@ -17,6 +19,9 @@ interface EngineState {
   gear: number;
   throttle: number;
   reachedRedline: boolean;
+  torque: number;
+  horsepower: number;
+  isDynoEnabled: boolean;
 }
 
 export function useEngine() {
@@ -27,6 +32,9 @@ export function useEngine() {
     gear: 0, // 0 = neutral, 1-6 = gears
     throttle: 0,
     reachedRedline: false,
+    torque: 0,
+    horsepower: 0,
+    isDynoEnabled: false,
   });
 
   const engineLoopRef = useRef<number | null>(null);
@@ -39,6 +47,33 @@ export function useEngine() {
     const ratio = GEAR_RATIOS[gear];
     // Simple formula to convert RPM to speed based on gear ratio
     return Math.min(MAX_SPEED_MPH, (rpm / ratio) / 35);
+  }, []);
+
+  // Calculate torque based on RPM
+  const calculateTorque = useCallback((rpm: number): number => {
+    // Simulated torque curve: Peak at ~3500-4000 RPM, tapering off at high RPM
+    if (rpm < 500) return 0;
+    
+    // Torque builds up quickly from idle to ~3500 RPM
+    if (rpm < 3500) {
+      return (MAX_TORQUE * rpm / 3500) * 0.8 + (MAX_TORQUE * 0.2);
+    } 
+    // Peak torque around 3500-4000 RPM
+    else if (rpm >= 3500 && rpm <= 4000) {
+      return MAX_TORQUE;
+    } 
+    // Gradually decreasing torque after peak
+    else {
+      const torqueDropoff = Math.min(1, (ENGINE_MAX_RPM - rpm) / (ENGINE_MAX_RPM - 4000));
+      return MAX_TORQUE * Math.max(0.7, torqueDropoff);
+    }
+  }, []);
+
+  // Calculate horsepower based on torque and RPM
+  const calculateHorsepower = useCallback((torque: number, rpm: number): number => {
+    // HP = (Torque × RPM) / 5252
+    if (rpm < 500) return 0;
+    return (torque * rpm) / 5252;
   }, []);
 
   // Start the engine
@@ -65,10 +100,27 @@ export function useEngine() {
       speed: 0,
       throttle: 0,
       reachedRedline: false,
+      torque: 0,
+      horsepower: 0,
     }));
 
     toast.success("Engine stopped");
   }, [engineState.isRunning]);
+
+  // Toggle dynamometer
+  const toggleDyno = useCallback(() => {
+    setEngineState(prev => {
+      const newState = { ...prev, isDynoEnabled: !prev.isDynoEnabled };
+      
+      if (newState.isDynoEnabled) {
+        toast.success("Dynamometer enabled");
+      } else {
+        toast.info("Dynamometer disabled");
+      }
+      
+      return newState;
+    });
+  }, []);
 
   // Shift to a specific gear
   const shiftToGear = useCallback((targetGear: number) => {
@@ -93,10 +145,16 @@ export function useEngine() {
         }
       }
 
+      // Calculate new torque and horsepower
+      const newTorque = calculateTorque(newRpm);
+      const newHorsepower = calculateHorsepower(newTorque, newRpm);
+      
       const newState = {
         ...prev,
         gear: targetGear,
         rpm: newRpm,
+        torque: newTorque,
+        horsepower: newHorsepower,
       };
       
       // Recalculate speed with new RPM and gear
@@ -110,7 +168,7 @@ export function useEngine() {
     } else {
       toast.info(`Shifted to gear ${targetGear}`);
     }
-  }, [engineState.isRunning, engineState.gear, calculateSpeed]);
+  }, [engineState.isRunning, engineState.gear, calculateSpeed, calculateTorque, calculateHorsepower]);
 
   // Shift up one gear
   const shiftUp = useCallback(() => {
@@ -175,6 +233,10 @@ export function useEngine() {
           newRpm = Math.max(prev.isRunning ? IDLE_RPM : 0, newRpm - rpmDecrease);
         }
 
+        // Calculate new torque and horsepower
+        const newTorque = calculateTorque(newRpm);
+        const newHorsepower = calculateHorsepower(newTorque, newRpm);
+        
         // Calculate speed based on RPM and gear
         const newSpeed = calculateSpeed(newRpm, prev.gear);
         
@@ -186,6 +248,8 @@ export function useEngine() {
           rpm: newRpm,
           speed: newSpeed,
           reachedRedline,
+          torque: newTorque,
+          horsepower: newHorsepower,
         };
       });
 
@@ -199,7 +263,7 @@ export function useEngine() {
         window.cancelAnimationFrame(engineLoopRef.current);
       }
     };
-  }, [engineState.isRunning, calculateSpeed]);
+  }, [engineState.isRunning, calculateSpeed, calculateTorque, calculateHorsepower]);
 
   // Keyboard controls
   useEffect(() => {
@@ -226,6 +290,9 @@ export function useEngine() {
         case KEY_BINDINGS.NEUTRAL:
           shiftToGear(0);
           break;
+        case KEY_BINDINGS.TOGGLE_DYNO:
+          toggleDyno();
+          break;
       }
     };
     
@@ -245,7 +312,7 @@ export function useEngine() {
       window.removeEventListener('keydown', handleKeyDown);
       window.removeEventListener('keyup', handleKeyUp);
     };
-  }, [applyThrottle, shiftUp, shiftDown, startEngine, stopEngine, shiftToGear]);
+  }, [applyThrottle, shiftUp, shiftDown, startEngine, stopEngine, shiftToGear, toggleDyno]);
 
   return {
     ...engineState,
@@ -255,5 +322,6 @@ export function useEngine() {
     shiftUp,
     shiftDown,
     applyThrottle,
+    toggleDyno,
   };
 }
