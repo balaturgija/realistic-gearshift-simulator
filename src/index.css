@@ -1,3 +1,4 @@
+
 @tailwind base;
 @tailwind components;
 @tailwind utilities;
@@ -96,6 +97,99 @@
   }
 
   body {
-    @apply bg-background text-foreground;
+    @apply bg-dashboard-bg text-dashboard-text;
+    font-feature-settings: "rlig" 1, "calt" 1;
+    -webkit-font-smoothing: antialiased;
+    -moz-osx-font-smoothing: grayscale;
+  }
+}
+
+@layer components {
+  .glass-panel {
+    @apply bg-dashboard-panel/90 backdrop-blur-sm border border-white/10 shadow-lg;
+  }
+  
+  .gauge-container {
+    @apply relative w-full aspect-square rounded-full bg-dashboard-gauge-bg border-4 border-dashboard-panel overflow-hidden shadow-inner;
+  }
+  
+  .gauge-ticks {
+    @apply absolute inset-0 flex items-center justify-center;
+  }
+  
+  .gauge-tick {
+    @apply absolute h-2 w-0.5 bg-dashboard-text/60 origin-bottom;
+  }
+  
+  .gauge-tick-large {
+    @apply h-3 w-1 bg-dashboard-text/90;
+  }
+  
+  .gauge-tick-redline {
+    @apply bg-dashboard-gauge-redline;
+  }
+  
+  .gauge-value {
+    @apply absolute inset-0 flex items-center justify-center text-xl font-medium;
+  }
+  
+  .gauge-label {
+    @apply text-center text-dashboard-text/80 font-medium mt-2;
+  }
+  
+  .gauge-needle {
+    @apply absolute bottom-1/2 left-1/2 w-1 h-[45%] -ml-0.5 bg-dashboard-gauge-needle origin-bottom rounded-t-full shadow-md transition-transform duration-75;
+  }
+  
+  .gear-shifter {
+    @apply relative flex flex-col items-center justify-center p-4 rounded-lg glass-panel;
+  }
+  
+  .gear-slot {
+    @apply relative w-16 h-16 m-1 flex items-center justify-center rounded-md text-dashboard-text font-bold text-2xl border-2 transition-all duration-200;
+  }
+  
+  .gear-slot-inactive {
+    @apply border-dashboard-text/20 bg-dashboard-gauge-bg/50 text-dashboard-text/40;
+  }
+  
+  .gear-slot-active {
+    @apply border-dashboard-accent bg-dashboard-accent/10 text-dashboard-accent;
+  }
+  
+  .engine-controls {
+    @apply flex gap-4 mt-4;
+  }
+  
+  .engine-button {
+    @apply px-5 py-3 rounded-lg text-white font-medium transition-all duration-200 hover:scale-105;
+  }
+  
+  .start-button {
+    @apply bg-dashboard-accent hover:bg-dashboard-accent/90;
+  }
+  
+  .stop-button {
+    @apply bg-dashboard-gauge-redline hover:bg-dashboard-gauge-redline/90;
+  }
+  
+  .neutral-button {
+    @apply bg-dashboard-muted hover:bg-dashboard-muted/90;
+  }
+  
+  .dash-panel {
+    @apply glass-panel rounded-xl p-6 animate-zoom-in;
+  }
+  
+  .freq-bar {
+    @apply bg-dashboard-accent h-full w-2 rounded-full transition-all duration-75;
+  }
+  
+  .controls-hint {
+    @apply mt-4 p-3 rounded-lg bg-dashboard-panel/50 border border-white/5;
+  }
+  
+  .key-command {
+    @apply inline-flex items-center justify-center px-2 py-1 mx-1 rounded bg-dashboard-gauge-bg text-dashboard-text font-mono text-sm;
   }
 }
