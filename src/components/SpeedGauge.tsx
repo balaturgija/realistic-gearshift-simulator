@@ -12,13 +12,18 @@ export function SpeedGauge({ speed }: SpeedGaugeProps) {
     return Math.round(speed).toLocaleString();
   }, [speed]);
 
+  // Calculate percentage of max speed for the gauge
+  const gaugePercentage = useMemo(() => {
+    return (speed / MAX_SPEED_MPH) * 100;
+  }, [speed]);
+
   return (
-    <div className="flex flex-col items-center">
-      <div className="gauge-container bg-white">
+    <div className="flex flex-col items-center w-full max-w-md">
+      <div className="gauge-container relative w-60 h-60 rounded-full bg-gray-900/50 backdrop-blur-sm border border-gray-700 flex items-center justify-center">
         {/* Value display styled like the reference image */}
-        <div className="gauge-value">
-          <span className="text-4xl sm:text-5xl font-bold text-black">{formattedSpeed}</span>
-          <span className="text-xs text-gray-500 block mt-1">km/h</span>
+        <div className="gauge-value text-center z-10">
+          <span className="text-4xl sm:text-5xl font-bold text-white">{formattedSpeed}</span>
+          <span className="text-xs text-gray-400 block mt-1">km/h</span>
         </div>
         
         {/* Arc at the left side */}
@@ -30,13 +35,17 @@ export function SpeedGauge({ speed }: SpeedGaugeProps) {
               stroke="#10B981"
               strokeWidth="5"
               strokeLinecap="round"
+              style={{
+                strokeDasharray: '47.1',
+                strokeDashoffset: `${47.1 - (gaugePercentage / 100) * 47.1}`,
+              }}
             />
           </svg>
         </div>
         
         {/* D indicator */}
-        <div className="absolute bottom-10 left-1/2 -translate-x-1/2 bg-gray-200 rounded-full w-8 h-8 flex items-center justify-center">
-          <span className="text-black font-bold">D</span>
+        <div className="absolute bottom-10 left-1/2 -translate-x-1/2 bg-gray-800 rounded-full w-8 h-8 flex items-center justify-center border border-gray-700">
+          <span className="text-white font-bold">D</span>
         </div>
       </div>
     </div>
