@@ -101,6 +101,8 @@
     font-feature-settings: "rlig" 1, "calt" 1;
     -webkit-font-smoothing: antialiased;
     -moz-osx-font-smoothing: grayscale;
+    overflow: hidden;
+    height: 100vh;
   }
 }
 
@@ -110,7 +112,7 @@
   }
   
   .gauge-container {
-    @apply relative w-full aspect-square rounded-full bg-dashboard-gauge-bg border-4 border-dashboard-panel overflow-hidden shadow-inner;
+    @apply relative w-full max-w-[240px] aspect-square rounded-full bg-dashboard-gauge-bg border-4 border-dashboard-panel overflow-hidden shadow-inner;
   }
   
   .gauge-ticks {
@@ -142,11 +144,11 @@
   }
   
   .gear-shifter {
-    @apply relative flex flex-col items-center justify-center p-4 rounded-lg glass-panel;
+    @apply relative flex flex-col items-center justify-center p-2 sm:p-4 rounded-lg glass-panel;
   }
   
   .gear-slot {
-    @apply relative w-16 h-16 m-1 flex items-center justify-center rounded-md text-dashboard-text font-bold text-2xl border-2 transition-all duration-200;
+    @apply relative w-10 h-10 sm:w-16 sm:h-16 m-1 flex items-center justify-center rounded-md text-dashboard-text font-bold text-xl sm:text-2xl border-2 transition-all duration-200;
   }
   
   .gear-slot-inactive {
@@ -158,11 +160,11 @@
   }
   
   .engine-controls {
-    @apply flex gap-4 mt-4;
+    @apply flex gap-2 sm:gap-4 mt-2 sm:mt-4;
   }
   
   .engine-button {
-    @apply px-5 py-3 rounded-lg text-white font-medium transition-all duration-200 hover:scale-105;
+    @apply px-3 py-2 sm:px-5 sm:py-3 rounded-lg text-white font-medium transition-all duration-200 hover:scale-105 text-sm sm:text-base;
   }
   
   .start-button {
@@ -178,18 +180,18 @@
   }
   
   .dash-panel {
-    @apply glass-panel rounded-xl p-6 animate-zoom-in;
+    @apply glass-panel rounded-xl p-3 sm:p-6 animate-zoom-in;
   }
   
   .freq-bar {
-    @apply bg-dashboard-accent h-full w-2 rounded-full transition-all duration-75;
+    @apply bg-dashboard-accent h-full w-1 sm:w-2 rounded-full transition-all duration-75;
   }
   
   .controls-hint {
-    @apply mt-4 p-3 rounded-lg bg-dashboard-panel/50 border border-white/5;
+    @apply mt-2 p-2 sm:p-3 rounded-lg bg-dashboard-panel/50 border border-white/5;
   }
   
   .key-command {
-    @apply inline-flex items-center justify-center px-2 py-1 mx-1 rounded bg-dashboard-gauge-bg text-dashboard-text font-mono text-sm;
+    @apply inline-flex items-center justify-center px-1.5 py-0.5 sm:px-2 sm:py-1 mx-1 rounded bg-dashboard-gauge-bg text-dashboard-text font-mono text-xs sm:text-sm;
   }
 }

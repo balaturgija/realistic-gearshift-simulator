@@ -40,9 +40,9 @@ export function GearShifter({ currentGear, isEngineRunning, onShift }: GearShift
   }, [currentGear, isEngineRunning, onShift]);
 
   return (
-    <div className="gear-shifter">
-      <h2 className="text-xl font-semibold mb-4">Gear Shifter</h2>
-      <div className="relative">
+    <div className="gear-shifter h-full">
+      <h2 className="text-lg sm:text-xl font-semibold mb-2 sm:mb-4">Gear Shifter</h2>
+      <div className="relative flex justify-center items-center">
         {gearSlots}
       </div>
     </div>

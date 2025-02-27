@@ -30,24 +30,24 @@ export function Dashboard() {
   });
 
   return (
-    <div className="container mx-auto px-4 py-8 flex flex-col">
-      <h1 className="text-4xl font-bold text-center mb-2 animate-fade-in">V8 Engine Simulator</h1>
-      <p className="text-center text-dashboard-muted mb-8 animate-fade-in">Experience the power and sound of a high-performance V8 engine</p>
+    <div className="container mx-auto h-screen flex flex-col px-2 sm:px-4 py-4">
+      <h1 className="text-2xl sm:text-4xl font-bold text-center mb-1 animate-fade-in">V8 Engine Simulator</h1>
+      <p className="text-center text-dashboard-muted mb-4 text-sm sm:text-base animate-fade-in">Experience the power and sound of a high-performance V8 engine</p>
       
-      {/* Dashboard */}
-      <div className="grid grid-cols-1 md:grid-cols-2 gap-8 mb-8">
-        <div className="dash-panel">
+      {/* Dashboard - Main content takes most of the space */}
+      <div className="grid grid-cols-1 md:grid-cols-2 gap-4 mb-4 flex-grow">
+        <div className="dash-panel flex items-center justify-center">
           <RPMGauge rpm={rpm} reachedRedline={reachedRedline} />
         </div>
-        <div className="dash-panel">
+        <div className="dash-panel flex items-center justify-center">
           <SpeedGauge speed={speed} />
         </div>
       </div>
       
-      {/* Controls & Gear shifter */}
-      <div className="grid grid-cols-1 md:grid-cols-3 gap-8 mb-8">
+      {/* Controls & Gear shifter - Taking less space */}
+      <div className="grid grid-cols-1 md:grid-cols-3 gap-4 mb-4">
         <div className="dash-panel flex flex-col">
-          <h2 className="text-xl font-semibold mb-4">Engine Controls</h2>
+          <h2 className="text-lg sm:text-xl font-semibold mb-2">Engine Controls</h2>
           
           <div className="engine-controls">
             <button 
@@ -66,13 +66,13 @@ export function Dashboard() {
             </button>
           </div>
           
-          <div className="mt-6">
+          <div className="mt-4">
             <button 
-              className="w-full py-4 px-6 flex items-center justify-center bg-dashboard-accent/20 border border-dashboard-accent rounded-lg hover:bg-dashboard-accent/30 transition-colors duration-200"
-              onClick={() => applyThrottle(0.3)}
+              className="w-full py-3 px-4 flex items-center justify-center bg-dashboard-accent/20 border border-dashboard-accent rounded-lg hover:bg-dashboard-accent/30 transition-colors duration-200"
+              onPointerDown={() => applyThrottle(0.3)}
               disabled={!isRunning}
             >
-              <span className="text-lg font-semibold">Apply Throttle</span>
+              <span className="text-base sm:text-lg font-semibold">Apply Throttle</span>
             </button>
           </div>
         </div>
@@ -87,7 +87,7 @@ export function Dashboard() {
       </div>
       
       {/* Performance Monitor */}
-      <div className="mb-8 animate-slide-in">
+      <div className="mb-4 animate-slide-in">
         <PerformanceMonitor 
           frequencies={frequencies}
           fps={fps}
@@ -95,9 +95,9 @@ export function Dashboard() {
       </div>
       
       {/* Keyboard controls guide */}
-      <div className="controls-hint animate-fade-in">
-        <h3 className="font-medium mb-2">Keyboard Controls:</h3>
-        <div className="grid grid-cols-2 md:grid-cols-3 gap-4">
+      <div className="controls-hint animate-fade-in text-xs sm:text-sm">
+        <h3 className="font-medium mb-1">Keyboard Controls:</h3>
+        <div className="grid grid-cols-2 sm:grid-cols-3 gap-2">
           <div className="flex items-center">
             <span className="key-command">{KEY_BINDINGS.THROTTLE.toUpperCase()}</span>
             <span className="ml-2">Increase gas</span>

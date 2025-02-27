@@ -32,6 +32,38 @@ export function RPMGauge({ rpm, reachedRedline = false }: RPMGaugeProps) {
     });
   }, []);
 
+  // Generate tick numbers
+  const tickNumbers = useMemo(() => {
+    return Array.from({ length: 9 }).map((_, i) => {
+      // 0, 1, 2, 3, 4, 5, 6, 7, 8
+      const value = i;
+      
+      // Calculate position
+      const angle = -120 + (i / 8) * 240;
+      const radians = (angle * Math.PI) / 180;
+      
+      // Position numbers at 80% of gauge radius
+      const x = 50 + 40 * Math.cos(radians);
+      const y = 50 + 40 * Math.sin(radians);
+      
+      const isRedline = value * 1000 >= REDLINE_RPM;
+      
+      return (
+        <div 
+          key={i}
+          className={`absolute text-xs font-medium ${isRedline ? 'text-dashboard-gauge-redline' : 'text-dashboard-text'}`}
+          style={{ 
+            left: `${x}%`, 
+            top: `${y}%`, 
+            transform: 'translate(-50%, -50%)'
+          }}
+        >
+          {value}
+        </div>
+      );
+    });
+  }, []);
+
   // Format RPM for display
   const formattedRPM = useMemo(() => {
     return Math.round(rpm).toLocaleString();
@@ -43,6 +75,11 @@ export function RPMGauge({ rpm, reachedRedline = false }: RPMGaugeProps) {
         {/* Tick marks */}
         <div className="gauge-ticks">
           {ticks}
+        </div>
+        
+        {/* Tick numbers */}
+        <div className="gauge-numbers">
+          {tickNumbers}
         </div>
         
         {/* Value display */}

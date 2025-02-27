@@ -31,7 +31,7 @@ export function useEngine() {
 
   const engineLoopRef = useRef<number | null>(null);
   const lastUpdateTimeRef = useRef<number>(Date.now());
-  const throttleDecayTimerRef = useRef<number | null>(null);
+  const throttleKeyPressedRef = useRef<boolean>(false);
 
   // Calculate speed based on RPM and current gear
   const calculateSpeed = useCallback((rpm: number, gear: number): number => {
@@ -130,24 +130,10 @@ export function useEngine() {
   const applyThrottle = useCallback((amount: number) => {
     if (!engineState.isRunning) return;
     
-    // Clear any existing throttle decay timer
-    if (throttleDecayTimerRef.current) {
-      window.clearTimeout(throttleDecayTimerRef.current);
-    }
-    
-    // Apply throttle
     setEngineState(prev => ({
       ...prev,
-      throttle: Math.min(1, prev.throttle + amount),
+      throttle: Math.min(1, amount),
     }));
-    
-    // Set up automatic throttle decay
-    throttleDecayTimerRef.current = window.setTimeout(() => {
-      setEngineState(prev => ({
-        ...prev,
-        throttle: Math.max(0, prev.throttle - 0.1),
-      }));
-    }, 200);
   }, [engineState.isRunning]);
 
   // Main engine simulation loop
@@ -173,7 +159,7 @@ export function useEngine() {
         const inNeutral = prev.gear === 0;
 
         // Calculate RPM changes based on throttle and current state
-        if (prev.throttle > 0) {
+        if (throttleKeyPressedRef.current) {
           // RPM rises faster in neutral
           const rpmIncrease = inNeutral 
             ? prev.throttle * 1500 * deltaTime
@@ -222,7 +208,8 @@ export function useEngine() {
       
       switch (key) {
         case KEY_BINDINGS.THROTTLE:
-          applyThrottle(0.15);
+          throttleKeyPressedRef.current = true;
+          applyThrottle(0.8); // Higher value for keyboard control
           break;
         case KEY_BINDINGS.SHIFT_UP:
           shiftUp();
@@ -241,10 +228,22 @@ export function useEngine() {
           break;
       }
     };
+    
+    const handleKeyUp = (e: KeyboardEvent) => {
+      const key = e.key.toLowerCase();
+      
+      if (key === KEY_BINDINGS.THROTTLE) {
+        throttleKeyPressedRef.current = false;
+        applyThrottle(0); // Release throttle when key is released
+      }
+    };
 
     window.addEventListener('keydown', handleKeyDown);
+    window.addEventListener('keyup', handleKeyUp);
+    
     return () => {
       window.removeEventListener('keydown', handleKeyDown);
+      window.removeEventListener('keyup', handleKeyUp);
     };
   }, [applyThrottle, shiftUp, shiftDown, startEngine, stopEngine, shiftToGear]);
 
