@@ -27,6 +27,9 @@ export function useSound({ isEngineRunning, rpm, maxRpm, gear, throttle }: UseSo
   // FPS calculation
   const framesRef = useRef<number>(0);
   const lastFpsUpdateRef = useRef<number>(Date.now());
+  
+  // Track previous gear to prevent multiple sound effects
+  const prevGearRef = useRef<number>(0);
 
   // Load a sound file and decode it
   const loadSound = useCallback(async (url: string): Promise<AudioBuffer | null> => {
@@ -79,13 +82,13 @@ export function useSound({ isEngineRunning, rpm, maxRpm, gear, throttle }: UseSo
                       Math.exp(-t * 5) * 0.3;
           }
         } else if (url.includes('shift')) {
-          // Gear shift sound
+          // Gear shift sound - make it much more subtle
           for (let i = 0; i < data.length; i++) {
             const t = i / audioContextRef.current!.sampleRate;
-            if (t < 0.1) {
-              data[i] = Math.random() * 0.5;
+            if (t < 0.05) {
+              data[i] = Math.random() * 0.2; // Lower volume
             } else {
-              data[i] = Math.random() * 0.5 * Math.exp(-(t - 0.1) * 20);
+              data[i] = Math.random() * 0.2 * Math.exp(-(t - 0.05) * 30); // Faster decay
             }
           }
         }
@@ -143,6 +146,11 @@ export function useSound({ isEngineRunning, rpm, maxRpm, gear, throttle }: UseSo
   const playSoundEffect = useCallback(async (type: 'start' | 'off' | 'shift') => {
     if (!audioContextRef.current) return;
     
+    // Skip gear shift sounds if we're just playing them too frequently
+    if (type === 'shift') {
+      return; // Disable shift sound completely
+    }
+    
     let soundUrl;
     switch (type) {
       case 'start':
@@ -160,7 +168,13 @@ export function useSound({ isEngineRunning, rpm, maxRpm, gear, throttle }: UseSo
     if (buffer) {
       const source = audioContextRef.current.createBufferSource();
       source.buffer = buffer;
-      source.connect(audioContextRef.current.destination);
+      
+      // Create a gain node to control volume
+      const effectGain = audioContextRef.current.createGain();
+      effectGain.gain.value = type === 'shift' ? 0.2 : 0.7; // Lower volume for shift sounds
+      
+      source.connect(effectGain);
+      effectGain.connect(audioContextRef.current.destination);
       source.start();
     }
   }, [loadSound]);
@@ -291,8 +305,12 @@ export function useSound({ isEngineRunning, rpm, maxRpm, gear, throttle }: UseSo
 
   // Play gear shift sound when gear changes
   useEffect(() => {
-    if (isEngineRunning && gear > 0) {
-      playSoundEffect('shift');
+    if (isEngineRunning && gear > 0 && gear !== prevGearRef.current) {
+      // Only play gear shift sound for actual gear changes (not during initialization)
+      if (prevGearRef.current > 0) {
+        playSoundEffect('shift');
+      }
+      prevGearRef.current = gear;
     }
   }, [gear, isEngineRunning, playSoundEffect]);
 

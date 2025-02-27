@@ -24,7 +24,7 @@ export const NEEDLE_ANIMATION_MS = 75; // Needle movement smoothness
 
 // Performance monitoring
 export const FPS_UPDATE_INTERVAL_MS = 500;
-export const FREQUENCY_BANDS = 16; // Number of frequency bars
+export const FREQUENCY_BANDS = 16; // Number of frequency bands
 
 // Key controls
 export const KEY_BINDINGS = {
@@ -36,3 +36,8 @@ export const KEY_BINDINGS = {
   NEUTRAL: 'n',
   TOGGLE_DYNO: 'k',
 };
+
+// Throttle settings
+export const THROTTLE_INCREASE_RATE = 2000; // How quickly RPM rises with throttle
+export const THROTTLE_DECAY_RATE = 500;     // How quickly RPM falls without throttle
+export const MAX_THROTTLE_VALUE = 1.0;      // Maximum throttle value

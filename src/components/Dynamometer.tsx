@@ -29,12 +29,12 @@ export function Dynamometer({ speed, torque, horsepower }: DynamometerProps) {
   return (
     <div className="grid grid-cols-1 md:grid-cols-3 gap-4 mb-4 w-full">
       <div className="dash-panel flex items-center justify-center">
-        <div className="flex flex-col items-center">
-          <div className="gauge-container bg-white">
-            {/* Value display styled like the reference image */}
-            <div className="gauge-value">
-              <span className="text-4xl sm:text-5xl font-bold text-black">{formattedSpeed}</span>
-              <span className="text-xs text-gray-500 block mt-1">km/h</span>
+        <div className="flex flex-col items-center w-full max-w-md">
+          <div className="gauge-container relative w-40 h-40 rounded-full bg-gray-900/50 backdrop-blur-sm border border-gray-700 flex items-center justify-center">
+            {/* Value display */}
+            <div className="gauge-value text-center z-10">
+              <span className="text-3xl font-bold text-white">{formattedSpeed}</span>
+              <span className="text-xs text-gray-400 block mt-1">km/h</span>
             </div>
             
             {/* Arc at the top */}
@@ -51,21 +51,21 @@ export function Dynamometer({ speed, torque, horsepower }: DynamometerProps) {
             </div>
             
             {/* D indicator */}
-            <div className="absolute bottom-10 left-1/2 -translate-x-1/2 bg-gray-200 rounded-full w-8 h-8 flex items-center justify-center">
-              <span className="text-black font-bold">D</span>
+            <div className="absolute bottom-6 left-1/2 -translate-x-1/2 bg-gray-800 rounded-full w-6 h-6 flex items-center justify-center border border-gray-700">
+              <span className="text-white font-bold text-xs">D</span>
             </div>
           </div>
-          <div className="gauge-label">Dyno Speed</div>
+          <div className="text-sm font-medium text-gray-300 mt-2">Dyno Speed</div>
         </div>
       </div>
       
       <div className="dash-panel flex items-center justify-center">
-        <div className="flex flex-col items-center">
-          <div className="gauge-container bg-white">
-            {/* Value display styled like the reference image */}
-            <div className="gauge-value">
-              <span className="text-4xl sm:text-5xl font-bold text-black">{formattedTorque}</span>
-              <span className="text-xs text-gray-500 block mt-1">Nm</span>
+        <div className="flex flex-col items-center w-full max-w-md">
+          <div className="gauge-container relative w-40 h-40 rounded-full bg-gray-900/50 backdrop-blur-sm border border-gray-700 flex items-center justify-center">
+            {/* Value display */}
+            <div className="gauge-value text-center z-10">
+              <span className="text-3xl font-bold text-white">{formattedTorque}</span>
+              <span className="text-xs text-gray-400 block mt-1">Nm</span>
             </div>
             
             {/* Arc at the top */}
@@ -82,21 +82,21 @@ export function Dynamometer({ speed, torque, horsepower }: DynamometerProps) {
             </div>
             
             {/* D indicator */}
-            <div className="absolute bottom-10 left-1/2 -translate-x-1/2 bg-gray-200 rounded-full w-8 h-8 flex items-center justify-center">
-              <span className="text-black font-bold">D</span>
+            <div className="absolute bottom-6 left-1/2 -translate-x-1/2 bg-gray-800 rounded-full w-6 h-6 flex items-center justify-center border border-gray-700">
+              <span className="text-white font-bold text-xs">D</span>
             </div>
           </div>
-          <div className="gauge-label">Torque</div>
+          <div className="text-sm font-medium text-gray-300 mt-2">Torque</div>
         </div>
       </div>
       
       <div className="dash-panel flex items-center justify-center">
-        <div className="flex flex-col items-center">
-          <div className="gauge-container bg-white">
-            {/* Value display styled like the reference image */}
-            <div className="gauge-value">
-              <span className="text-4xl sm:text-5xl font-bold text-black">{formattedPower}</span>
-              <span className="text-xs text-gray-500 block mt-1">HP</span>
+        <div className="flex flex-col items-center w-full max-w-md">
+          <div className="gauge-container relative w-40 h-40 rounded-full bg-gray-900/50 backdrop-blur-sm border border-gray-700 flex items-center justify-center">
+            {/* Value display */}
+            <div className="gauge-value text-center z-10">
+              <span className="text-3xl font-bold text-white">{formattedPower}</span>
+              <span className="text-xs text-gray-400 block mt-1">HP</span>
             </div>
             
             {/* Arc at the top */}
@@ -113,11 +113,11 @@ export function Dynamometer({ speed, torque, horsepower }: DynamometerProps) {
             </div>
             
             {/* D indicator */}
-            <div className="absolute bottom-10 left-1/2 -translate-x-1/2 bg-gray-200 rounded-full w-8 h-8 flex items-center justify-center">
-              <span className="text-black font-bold">D</span>
+            <div className="absolute bottom-6 left-1/2 -translate-x-1/2 bg-gray-800 rounded-full w-6 h-6 flex items-center justify-center border border-gray-700">
+              <span className="text-white font-bold text-xs">D</span>
             </div>
           </div>
-          <div className="gauge-label">Horsepower</div>
+          <div className="text-sm font-medium text-gray-300 mt-2">Horsepower</div>
         </div>
       </div>
     </div>
