@@ -1,14 +1,14 @@
 
 // Engine Simulation Constants
-export const ENGINE_MAX_RPM = 8000;
-export const IDLE_RPM = 800;
-export const REDLINE_RPM = 7000;
-export const MAX_SPEED_MPH = 220;
-export const GEAR_RATIOS = [0, 3.5, 2.5, 1.8, 1.3, 1.1, 0.8]; // Neutral + 6 gears
+export const ENGINE_MAX_RPM = 8500;
+export const IDLE_RPM = 850;
+export const REDLINE_RPM = 7500;
+export const MAX_SPEED_MPH = 240;
+export const GEAR_RATIOS = [0, 3.2, 2.3, 1.6, 1.2, 1.0, 0.8]; // Neutral + 6 gears (more aggressive)
 
 // Dynamometer Constants
-export const MAX_TORQUE = 500; // Nm
-export const MAX_POWER = 450; // HP
+export const MAX_TORQUE = 550; // Nm - for Chevrolet 454 V8
+export const MAX_POWER = 500; // HP - for Chevrolet 454 V8
 
 // Sound simulation
 export const SOUND_FILES = {
@@ -20,7 +20,7 @@ export const SOUND_FILES = {
 };
 
 // Animation timing
-export const NEEDLE_ANIMATION_MS = 75; // Needle movement smoothness
+export const NEEDLE_ANIMATION_MS = 50; // Faster needle movement for more responsiveness
 
 // Performance monitoring
 export const FPS_UPDATE_INTERVAL_MS = 500;
@@ -29,15 +29,15 @@ export const FREQUENCY_BANDS = 16; // Number of frequency bands
 // Key controls
 export const KEY_BINDINGS = {
   THROTTLE: 'w',
-  SHIFT_UP: 's',
-  SHIFT_DOWN: 'd',
+  SHIFT_UP: 'ArrowUp',
+  SHIFT_DOWN: 'ArrowDown',
   ENGINE_START: 'p',
-  ENGINE_STOP: 'f',
+  ENGINE_STOP: 'p', // Same key for toggle
   NEUTRAL: 'n',
   TOGGLE_DYNO: 'k',
 };
 
 // Throttle settings
-export const THROTTLE_INCREASE_RATE = 2000; // How quickly RPM rises with throttle
-export const THROTTLE_DECAY_RATE = 500;     // How quickly RPM falls without throttle
+export const THROTTLE_INCREASE_RATE = 3500; // More aggressive throttle response
+export const THROTTLE_DECAY_RATE = 800;     // Faster RPM drop
 export const MAX_THROTTLE_VALUE = 1.0;      // Maximum throttle value

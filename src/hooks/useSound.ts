@@ -31,6 +31,14 @@ export function useSound({ isEngineRunning, rpm, maxRpm, gear, throttle }: UseSo
   // Track previous gear to prevent multiple sound effects
   const prevGearRef = useRef<number>(0);
 
+  // Audio simulation parameters
+  const [volume, setVolume] = useState<number>(0.7);
+  const [convolutionLevel, setConvolutionLevel] = useState<number>(0.5);
+  const [highFreqGain, setHighFreqGain] = useState<number>(0.6);
+  const [lowFreqNoise, setLowFreqNoise] = useState<number>(0.4);
+  const [highFreqNoise, setHighFreqNoise] = useState<number>(0.3);
+  const [simulationFreq, setSimulationFreq] = useState<number>(60);
+
   // Load a sound file and decode it
   const loadSound = useCallback(async (url: string): Promise<AudioBuffer | null> => {
     try {
@@ -55,40 +63,84 @@ export function useSound({ isEngineRunning, rpm, maxRpm, gear, throttle }: UseSo
         
         // Different waveforms based on sound type
         if (url.includes('idle')) {
-          // Lower frequency for idle
+          // V8 idle simulation - deeper, more complex sound
           for (let i = 0; i < data.length; i++) {
+            const t = i / audioContextRef.current.sampleRate;
+            // Add more harmonics for richer V8 sound
             data[i] = Math.sin(i * 0.01) * 0.1 + 
-                      Math.sin(i * 0.02) * 0.05;
+                      Math.sin(i * 0.02) * 0.05 +
+                      Math.sin(i * 0.04) * 0.025 * Math.sin(t * 4) + // Pulsing
+                      (Math.random() * 0.02 - 0.01) * lowFreqNoise; // Low freq noise
           }
         } else if (url.includes('revving')) {
-          // Higher frequencies for revving
+          // V8 revving - aggressive, powerful sound
           for (let i = 0; i < data.length; i++) {
+            const t = i / audioContextRef.current.sampleRate;
+            // Add more harmonics and distortion for aggressive V8 sound
             data[i] = Math.sin(i * 0.03) * 0.2 + 
                       Math.sin(i * 0.06) * 0.1 +
-                      Math.sin(i * 0.12) * 0.05;
+                      Math.sin(i * 0.12) * 0.05 * Math.sin(t * 8) + // Fast pulsing
+                      Math.sin(i * 0.09) * 0.08 * Math.sin(t * 2) + // Slower pulsing
+                      (Math.random() * 0.04 - 0.02) * highFreqNoise; // High freq noise
           }
         } else if (url.includes('start')) {
-          // Engine start sound
+          // Engine start sound - more dramatic for a V8
           for (let i = 0; i < data.length; i++) {
-            const t = i / audioContextRef.current!.sampleRate;
-            data[i] = Math.sin(440 * 2 * Math.PI * t) * 
-                      (t < 0.1 ? t * 10 : (t < 1.8 ? 1 : (2 - t) * 5)) * 0.25;
+            const t = i / audioContextRef.current.sampleRate;
+            // Simulate starter motor followed by ignition
+            if (t < 0.3) {
+              // Starter motor
+              data[i] = Math.sin(80 * 2 * Math.PI * t) * 0.3 * 
+                        (1 - Math.random() * 0.1) + 
+                        (Math.random() * 0.1 - 0.05);
+            } else if (t < 0.6) {
+              // Ignition attempt
+              data[i] = Math.sin(40 * 2 * Math.PI * t) * 0.5 * 
+                        Math.sin(120 * t) +
+                        (Math.random() * 0.4 - 0.2);
+            } else {
+              // Engine catches and roars to life
+              const fade = Math.min(1, (t - 0.6) * 4);
+              const baseFreq = 60 + (t - 0.6) * 200;
+              data[i] = Math.sin(baseFreq * 2 * Math.PI * t) * 0.3 * fade +
+                        Math.sin(baseFreq * 2 * 2 * Math.PI * t) * 0.2 * fade +
+                        Math.sin(baseFreq * 4 * 2 * Math.PI * t) * 0.1 * fade +
+                        (Math.random() * 0.1 - 0.05) * fade;
+            }
           }
         } else if (url.includes('off')) {
-          // Engine off sound
+          // Engine off sound - with afterfire effect for a V8
           for (let i = 0; i < data.length; i++) {
-            const t = i / audioContextRef.current!.sampleRate;
-            data[i] = Math.sin(220 * 2 * Math.PI * t) * 
-                      Math.exp(-t * 5) * 0.3;
+            const t = i / audioContextRef.current.sampleRate;
+            if (t < 0.1) {
+              // Initial cut
+              data[i] = Math.sin(120 * 2 * Math.PI * t) * 
+                        Math.exp(-t * 10) * 0.5;
+            } else if (t < 0.2) {
+              // Brief silence
+              data[i] = Math.random() * 0.01;
+            } else if (t < 0.3) {
+              // Afterfire pop
+              data[i] = (Math.random() * 0.5 - 0.25) * Math.exp(-(t - 0.25) * 40);
+            } else {
+              // Final decay
+              data[i] = Math.random() * 0.02 * Math.exp(-(t - 0.3) * 5);
+            }
           }
         } else if (url.includes('shift')) {
-          // Gear shift sound - make it much more subtle
+          // Gear shift sound - with transmission whine and clutch engagement
           for (let i = 0; i < data.length; i++) {
-            const t = i / audioContextRef.current!.sampleRate;
+            const t = i / audioContextRef.current.sampleRate;
             if (t < 0.05) {
-              data[i] = Math.random() * 0.2; // Lower volume
+              // Clutch disengage
+              data[i] = Math.sin(800 * 2 * Math.PI * t) * 0.1 * (1 - t/0.05);
+            } else if (t < 0.1) {
+              // Gear engagement
+              data[i] = Math.sin(400 * 2 * Math.PI * t) * 0.15 + 
+                        (Math.random() * 0.1 - 0.05);
             } else {
-              data[i] = Math.random() * 0.2 * Math.exp(-(t - 0.05) * 30); // Faster decay
+              // Clutch reengagement
+              data[i] = Math.sin(600 * 2 * Math.PI * t) * 0.1 * Math.exp(-(t - 0.1) * 20);
             }
           }
         }
@@ -99,7 +151,7 @@ export function useSound({ isEngineRunning, rpm, maxRpm, gear, throttle }: UseSo
       console.error('Error loading sound:', error);
       return null;
     }
-  }, []);
+  }, [lowFreqNoise, highFreqNoise]);
 
   // Create and configure audio nodes
   const setupAudio = useCallback(async () => {
@@ -145,11 +197,6 @@ export function useSound({ isEngineRunning, rpm, maxRpm, gear, throttle }: UseSo
   // Play a one-shot sound effect
   const playSoundEffect = useCallback(async (type: 'start' | 'off' | 'shift') => {
     if (!audioContextRef.current) return;
-    
-    // Skip gear shift sounds if we're just playing them too frequently
-    if (type === 'shift') {
-      return; // Disable shift sound completely
-    }
     
     let soundUrl;
     switch (type) {
@@ -242,7 +289,7 @@ export function useSound({ isEngineRunning, rpm, maxRpm, gear, throttle }: UseSo
         if (gainNodeRef.current) {
           gainNodeRef.current.gain.setValueAtTime(0.3, audioContextRef.current!.currentTime);
           gainNodeRef.current.gain.linearRampToValueAtTime(
-            0.7, 
+            volume, 
             audioContextRef.current!.currentTime + 0.5
           );
         }
@@ -270,7 +317,7 @@ export function useSound({ isEngineRunning, rpm, maxRpm, gear, throttle }: UseSo
         cancelAnimationFrame(animationFrameRef.current);
       }
     };
-  }, [isEngineRunning, updateVisualizer, playSoundEffect]);
+  }, [isEngineRunning, updateVisualizer, playSoundEffect, volume]);
 
   // Modulate engine sound based on RPM and throttle
   useEffect(() => {
@@ -279,15 +326,16 @@ export function useSound({ isEngineRunning, rpm, maxRpm, gear, throttle }: UseSo
     const rpmRatio = rpm / maxRpm;
     
     // Adjust playback rate based on RPM (higher RPM = higher pitch)
-    idleSourceRef.current.playbackRate.value = 0.8 + rpmRatio * 0.4;
-    revSourceRef.current.playbackRate.value = 0.8 + rpmRatio * 0.6;
+    // More aggressive for V8 behavior
+    idleSourceRef.current.playbackRate.value = 0.8 + rpmRatio * 0.6;
+    revSourceRef.current.playbackRate.value = 0.8 + rpmRatio * 0.8;
     
     // Adjust the balance between idle and rev sounds
     const now = audioContextRef.current!.currentTime;
     
     // Adjust volume based on throttle and RPM
     gainNodeRef.current.gain.setTargetAtTime(
-      0.3 + (throttle * 0.7), // Base volume + throttle boost
+      0.3 + (throttle * 0.9), // More pronounced throttle boost for V8
       now,
       0.1 // Time constant
     );
@@ -314,5 +362,89 @@ export function useSound({ isEngineRunning, rpm, maxRpm, gear, throttle }: UseSo
     }
   }, [gear, isEngineRunning, playSoundEffect]);
 
-  return { frequencies, fps };
+  // Handle keyboard + scroll events for audio adjustments
+  useEffect(() => {
+    const handleKeyDown = (e: KeyboardEvent) => {
+      // Store the key being pressed
+      const key = e.key.toLowerCase();
+      
+      // Don't handle if control keys are pressed
+      if (e.ctrlKey || e.altKey || e.metaKey) return;
+      
+      // Handle wheel events when specific keys are pressed
+      const handleWheel = (event: WheelEvent) => {
+        event.preventDefault();
+        
+        // Determine adjustment direction and amount
+        const direction = event.deltaY > 0 ? -1 : 1;
+        const adjustment = 0.05 * direction;
+        
+        switch (key) {
+          case 'z':
+            setVolume(prev => Math.max(0, Math.min(1, prev + adjustment)));
+            break;
+          case 'x':
+            setConvolutionLevel(prev => Math.max(0, Math.min(1, prev + adjustment)));
+            break;
+          case 'c':
+            setHighFreqGain(prev => Math.max(0, Math.min(1, prev + adjustment)));
+            break;
+          case 'v':
+            setLowFreqNoise(prev => Math.max(0, Math.min(1, prev + adjustment)));
+            break;
+          case 'b':
+            setHighFreqNoise(prev => Math.max(0, Math.min(1, prev + adjustment)));
+            break;
+          case 'n':
+            setSimulationFreq(prev => Math.max(20, Math.min(120, prev + adjustment * 40)));
+            break;
+        }
+      };
+      
+      if (['z', 'x', 'c', 'v', 'b', 'n'].includes(key)) {
+        window.addEventListener('wheel', handleWheel, { passive: false });
+        
+        // Remove event listener when key is released
+        const handleKeyUp = () => {
+          window.removeEventListener('wheel', handleWheel);
+          window.removeEventListener('keyup', handleKeyUp);
+        };
+        
+        window.addEventListener('keyup', handleKeyUp);
+      }
+    };
+    
+    window.addEventListener('keydown', handleKeyDown);
+    
+    return () => {
+      window.removeEventListener('keydown', handleKeyDown);
+      // In case the component unmounts while a key is being held
+      window.removeEventListener('wheel', () => {});
+    };
+  }, []);
+
+  // Apply volume changes to the audio output
+  useEffect(() => {
+    if (!gainNodeRef.current || !isEngineRunning) return;
+    
+    const baseVolume = volume;
+    gainNodeRef.current.gain.setTargetAtTime(
+      baseVolume + (throttle * 0.3), 
+      audioContextRef.current!.currentTime,
+      0.1
+    );
+  }, [volume, isEngineRunning, throttle]);
+
+  return { 
+    frequencies, 
+    fps,
+    audioParams: {
+      volume,
+      convolutionLevel,
+      highFreqGain,
+      lowFreqNoise,
+      highFreqNoise,
+      simulationFreq
+    }
+  };
 }
