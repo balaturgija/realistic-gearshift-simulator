@@ -333,9 +333,9 @@ export function useSound({ isEngineRunning, rpm, maxRpm, gear, throttle }: UseSo
     // Adjust the balance between idle and rev sounds
     const now = audioContextRef.current!.currentTime;
     
-    // Adjust volume based on throttle and RPM
+    // Adjust volume based on throttle and RPM - FIXED: Apply throttle value even when 0
     gainNodeRef.current.gain.setTargetAtTime(
-      0.3 + (throttle * 0.9), // More pronounced throttle boost for V8
+      0.3 + (throttle * 0.7), // More pronounced throttle boost for V8
       now,
       0.1 // Time constant
     );

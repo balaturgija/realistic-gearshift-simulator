@@ -1,3 +1,4 @@
+
 import { useState, useEffect, useCallback, useRef } from 'react';
 import { toast } from "sonner";
 import { 
@@ -55,6 +56,10 @@ export function useEngine() {
     startTime: 0,
     duration: 0
   });
+  
+  // Track if we're at redline to trigger bounce effect
+  const redlineTimeoutRef = useRef<NodeJS.Timeout | null>(null);
+  const hasReachedRedlineRef = useRef<boolean>(false);
 
   // Calculate speed based on RPM and current gear - more aggressive
   const calculateSpeed = useCallback((rpm: number, gear: number): number => {
@@ -109,6 +114,14 @@ export function useEngine() {
   // Stop the engine
   const stopEngine = useCallback(() => {
     if (!engineState.isRunning) return;
+
+    // Clear any redline timeout when stopping
+    if (redlineTimeoutRef.current) {
+      clearTimeout(redlineTimeoutRef.current);
+      redlineTimeoutRef.current = null;
+    }
+    
+    hasReachedRedlineRef.current = false;
 
     setEngineState(prev => ({
       ...prev,
@@ -326,7 +339,28 @@ export function useEngine() {
         }
         
         // Check if we're hitting the redline
-        const reachedRedline = newRpm >= REDLINE_RPM;
+        const hittingRedline = newRpm >= REDLINE_RPM;
+        
+        // Redline bounce effect logic
+        let reachedRedline = false;
+        if (hittingRedline) {
+          if (!hasReachedRedlineRef.current) {
+            hasReachedRedlineRef.current = true;
+            reachedRedline = true;
+            
+            // Clear any existing timeout
+            if (redlineTimeoutRef.current) {
+              clearTimeout(redlineTimeoutRef.current);
+            }
+            
+            // Set timeout to reset redline state after 1 second
+            redlineTimeoutRef.current = setTimeout(() => {
+              hasReachedRedlineRef.current = false;
+            }, 1000);
+          } else {
+            reachedRedline = true;
+          }
+        }
         
         return {
           ...prev,
@@ -346,6 +380,12 @@ export function useEngine() {
     return () => {
       if (engineLoopRef.current) {
         window.cancelAnimationFrame(engineLoopRef.current);
+      }
+      
+      // Clear any redline timeout
+      if (redlineTimeoutRef.current) {
+        clearTimeout(redlineTimeoutRef.current);
+        redlineTimeoutRef.current = null;
       }
     };
   }, [engineState.isRunning, calculateSpeed, calculateTorque, calculateHorsepower]);

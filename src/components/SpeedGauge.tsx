@@ -1,5 +1,5 @@
 
-import { useMemo, useState, useEffect } from 'react';
+import { useMemo } from 'react';
 import { MAX_SPEED_MPH } from '@/lib/constants';
 
 interface SpeedGaugeProps {
@@ -9,10 +9,6 @@ interface SpeedGaugeProps {
 }
 
 export function SpeedGauge({ speed, gear = 0, isRunning = false }: SpeedGaugeProps) {
-  // State for startup animation
-  const [showStartupAnimation, setShowStartupAnimation] = useState(false);
-  const [startupComplete, setStartupComplete] = useState(true);
-
   // Format speed for display
   const formattedSpeed = useMemo(() => {
     return Math.round(speed).toLocaleString();
@@ -22,22 +18,6 @@ export function SpeedGauge({ speed, gear = 0, isRunning = false }: SpeedGaugePro
   const gaugePercentage = useMemo(() => {
     return (speed / MAX_SPEED_MPH) * 100;
   }, [speed]);
-
-  // Trigger startup animation when engine starts
-  useEffect(() => {
-    if (isRunning && startupComplete) {
-      setStartupComplete(false);
-      setShowStartupAnimation(true);
-      
-      // After animation completes, hide it
-      const timer = setTimeout(() => {
-        setShowStartupAnimation(false);
-        setStartupComplete(true);
-      }, 2000);
-      
-      return () => clearTimeout(timer);
-    }
-  }, [isRunning, startupComplete]);
 
   return (
     <div className="flex flex-col items-center w-full max-w-md">
@@ -64,16 +44,6 @@ export function SpeedGauge({ speed, gear = 0, isRunning = false }: SpeedGaugePro
             />
           </svg>
         </div>
-        
-        {/* Startup animation overlay */}
-        {showStartupAnimation && (
-          <div className="absolute inset-0 bg-gray-900/70 flex items-center justify-center z-20 animate-fade-in">
-            <div className="flex flex-col items-center">
-              <div className="w-10 h-10 border-4 border-green-500 border-t-transparent rounded-full animate-spin mb-2"></div>
-              <span className="text-white text-lg">Starting...</span>
-            </div>
-          </div>
-        )}
         
         {/* Gear indicator in place of D */}
         <div className="absolute bottom-10 left-1/2 -translate-x-1/2 bg-gray-800 rounded-full w-8 h-8 flex items-center justify-center border border-gray-700">

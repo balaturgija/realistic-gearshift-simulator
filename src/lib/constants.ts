@@ -39,5 +39,5 @@ export const KEY_BINDINGS = {
 
 // Throttle settings
 export const THROTTLE_INCREASE_RATE = 3500; // More aggressive throttle response
-export const THROTTLE_DECAY_RATE = 800;     // Faster RPM drop
+export const THROTTLE_DECAY_RATE = 2400;     // Much faster RPM drop (increased from 800)
 export const MAX_THROTTLE_VALUE = 1.0;      // Maximum throttle value
