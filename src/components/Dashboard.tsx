@@ -3,9 +3,8 @@ import { useEngine } from '@/hooks/useEngine';
 import { useSound } from '@/hooks/useSound';
 import { RPMGauge } from './RPMGauge';
 import { SpeedGauge } from './SpeedGauge';
-import { PerformanceMonitor } from './PerformanceMonitor';
 import { Dynamometer } from './Dynamometer';
-import { ENGINE_MAX_RPM, KEY_BINDINGS } from '@/lib/constants';
+import { ENGINE_MAX_RPM } from '@/lib/constants';
 import { useState } from 'react';
 
 export function Dashboard() {
@@ -26,7 +25,7 @@ export function Dashboard() {
     toggleDyno
   } = useEngine();
 
-  const { frequencies, fps, audioParams } = useSound({
+  const { audioParams } = useSound({
     isEngineRunning: isRunning,
     rpm,
     maxRpm: ENGINE_MAX_RPM,
@@ -72,8 +71,8 @@ export function Dashboard() {
         <Dynamometer speed={speed} torque={torque} horsepower={horsepower} isRunning={isRunning} />
       )}
       
-      {/* Controls section - Taking less space */}
-      <div className="grid grid-cols-1 md:grid-cols-3 gap-4 mb-4">
+      {/* Controls section - Repositioned for better layout */}
+      <div className="grid grid-cols-1 md:grid-cols-3 gap-4 mt-auto">
         <div className="dash-panel flex flex-col">
           <h2 className="text-lg sm:text-xl font-semibold mb-4">Engine Controls</h2>
           
@@ -145,136 +144,27 @@ export function Dashboard() {
           </div>
         </div>
         
-        <div className="dash-panel col-span-1 md:col-span-2">
-          <h2 className="text-lg sm:text-xl font-semibold mb-2">Audio Parameters</h2>
-          
-          <div className="grid grid-cols-2 sm:grid-cols-3 gap-4">
-            <div className="audio-param">
-              <span className="text-sm text-dashboard-muted">Volume</span>
-              <div className="bg-gray-800 rounded-lg h-3 mt-1">
-                <div 
-                  className="bg-green-500 h-full rounded-lg" 
-                  style={{ width: `${audioParams?.volume * 100}%` }}
-                ></div>
+        <div className="dash-panel col-span-1 md:col-span-2 flex items-center justify-center">
+          <div className="w-full max-w-lg bg-gray-900/30 rounded-lg border border-gray-800 p-4">
+            <h2 className="text-lg sm:text-xl font-semibold mb-3">Control Dashboard</h2>
+            <div className="grid grid-cols-2 gap-3">
+              <div className="stat-box p-3 bg-gray-900/50 rounded-lg border border-gray-800">
+                <div className="text-sm text-gray-400">Current Gear</div>
+                <div className="text-2xl font-bold">{gear === 0 ? 'N' : gear}</div>
               </div>
-              <div className="flex justify-between text-xs mt-1">
-                <span>Z+Scroll</span>
-                <span>{Math.round((audioParams?.volume || 0) * 100)}%</span>
+              <div className="stat-box p-3 bg-gray-900/50 rounded-lg border border-gray-800">
+                <div className="text-sm text-gray-400">Throttle</div>
+                <div className="text-2xl font-bold">{Math.round(throttle * 100)}%</div>
               </div>
-            </div>
-            
-            <div className="audio-param">
-              <span className="text-sm text-dashboard-muted">Convolution</span>
-              <div className="bg-gray-800 rounded-lg h-3 mt-1">
-                <div 
-                  className="bg-blue-500 h-full rounded-lg" 
-                  style={{ width: `${audioParams?.convolutionLevel * 100}%` }}
-                ></div>
+              <div className="stat-box p-3 bg-gray-900/50 rounded-lg border border-gray-800">
+                <div className="text-sm text-gray-400">Torque</div>
+                <div className="text-2xl font-bold">{Math.round(torque)} Nm</div>
               </div>
-              <div className="flex justify-between text-xs mt-1">
-                <span>X+Scroll</span>
-                <span>{Math.round((audioParams?.convolutionLevel || 0) * 100)}%</span>
+              <div className="stat-box p-3 bg-gray-900/50 rounded-lg border border-gray-800">
+                <div className="text-sm text-gray-400">Horsepower</div>
+                <div className="text-2xl font-bold">{Math.round(horsepower)} HP</div>
               </div>
             </div>
-            
-            <div className="audio-param">
-              <span className="text-sm text-dashboard-muted">High Freq. Gain</span>
-              <div className="bg-gray-800 rounded-lg h-3 mt-1">
-                <div 
-                  className="bg-purple-500 h-full rounded-lg" 
-                  style={{ width: `${audioParams?.highFreqGain * 100}%` }}
-                ></div>
-              </div>
-              <div className="flex justify-between text-xs mt-1">
-                <span>C+Scroll</span>
-                <span>{Math.round((audioParams?.highFreqGain || 0) * 100)}%</span>
-              </div>
-            </div>
-            
-            <div className="audio-param">
-              <span className="text-sm text-dashboard-muted">Low Freq. Noise</span>
-              <div className="bg-gray-800 rounded-lg h-3 mt-1">
-                <div 
-                  className="bg-amber-500 h-full rounded-lg" 
-                  style={{ width: `${audioParams?.lowFreqNoise * 100}%` }}
-                ></div>
-              </div>
-              <div className="flex justify-between text-xs mt-1">
-                <span>V+Scroll</span>
-                <span>{Math.round((audioParams?.lowFreqNoise || 0) * 100)}%</span>
-              </div>
-            </div>
-            
-            <div className="audio-param">
-              <span className="text-sm text-dashboard-muted">High Freq. Noise</span>
-              <div className="bg-gray-800 rounded-lg h-3 mt-1">
-                <div 
-                  className="bg-red-500 h-full rounded-lg" 
-                  style={{ width: `${audioParams?.highFreqNoise * 100}%` }}
-                ></div>
-              </div>
-              <div className="flex justify-between text-xs mt-1">
-                <span>B+Scroll</span>
-                <span>{Math.round((audioParams?.highFreqNoise || 0) * 100)}%</span>
-              </div>
-            </div>
-            
-            <div className="audio-param">
-              <span className="text-sm text-dashboard-muted">Sim. Frequency</span>
-              <div className="bg-gray-800 rounded-lg h-3 mt-1">
-                <div 
-                  className="bg-teal-500 h-full rounded-lg" 
-                  style={{ width: `${(audioParams?.simulationFreq || 0) / 120 * 100}%` }}
-                ></div>
-              </div>
-              <div className="flex justify-between text-xs mt-1">
-                <span>N+Scroll</span>
-                <span>{Math.round(audioParams?.simulationFreq || 0)}Hz</span>
-              </div>
-            </div>
-          </div>
-        </div>
-      </div>
-      
-      {/* Performance Monitor */}
-      <div className="mb-4 animate-slide-in">
-        <PerformanceMonitor 
-          frequencies={frequencies}
-          fps={fps}
-        />
-      </div>
-      
-      {/* Keyboard controls guide */}
-      <div className="controls-hint animate-fade-in text-xs sm:text-sm p-3 bg-gray-900/50 rounded-lg border border-gray-800">
-        <h3 className="font-medium mb-2">Keyboard Controls:</h3>
-        <div className="grid grid-cols-2 sm:grid-cols-4 gap-2">
-          <div className="flex items-center">
-            <span className="key-command">{KEY_BINDINGS.THROTTLE.toUpperCase()}</span>
-            <span className="ml-2">Increase gas</span>
-          </div>
-          <div className="flex items-center">
-            <span className="key-command">↑</span>
-            <span className="ml-2">Shift gear up</span>
-          </div>
-          <div className="flex items-center">
-            <span className="key-command">↓</span>
-            <span className="ml-2">Shift gear down</span>
-          </div>
-          <div className="flex items-center">
-            <span className="key-command">{KEY_BINDINGS.ENGINE_START.toUpperCase()}</span>
-            <span className="ml-2">Start/Stop engine</span>
-          </div>
-          <div className="flex items-center">
-            <span className="key-command">{KEY_BINDINGS.NEUTRAL.toUpperCase()}</span>
-            <span className="ml-2">Shift to neutral</span>
-          </div>
-          <div className="flex items-center">
-            <span className="key-command">{KEY_BINDINGS.TOGGLE_DYNO.toUpperCase()}</span>
-            <span className="ml-2">Toggle dyno</span>
-          </div>
-          <div className="flex items-center">
-            <span className="key-command">Z-N+Scroll</span>
-            <span className="ml-2">Audio adjustments</span>
           </div>
         </div>
       </div>
