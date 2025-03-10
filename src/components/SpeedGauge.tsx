@@ -28,7 +28,7 @@ export function SpeedGauge({ speed, gear = 0, isRunning = false }: SpeedGaugePro
           <span className="text-xs text-gray-400 block mt-1">km/h</span>
         </div>
         
-        {/* Arc at the left side (left-to-right, as before) */}
+        {/* Arc with improved animation */}
         <div className="absolute top-0 left-0 w-full h-full">
           <svg width="100%" height="100%" viewBox="0 0 100 100">
             <path
@@ -40,18 +40,18 @@ export function SpeedGauge({ speed, gear = 0, isRunning = false }: SpeedGaugePro
               style={{
                 strokeDasharray: '47.1',
                 strokeDashoffset: `${47.1 - (gaugePercentage / 100) * 47.1}`,
+                transition: 'stroke-dashoffset 300ms cubic-bezier(0.4, 0, 0.2, 1)',
               }}
             />
           </svg>
         </div>
         
-        {/* Gear indicator in place of D */}
+        {/* Gear indicator - only show green dot during gear changes, not when engine starts */}
         <div className="absolute bottom-10 left-1/2 -translate-x-1/2 bg-gray-800 rounded-full w-8 h-8 flex items-center justify-center border border-gray-700">
-          {isRunning && (
-            <span className="text-white font-bold">
-              {gear === 0 ? 'N' : gear}
-            </span>
-          )}
+          <span className="text-white font-bold">
+            {gear === 0 ? 'N' : gear}
+          </span>
+          {gear > 0 && <div className="absolute -top-1 -right-1 w-3 h-3 rounded-full bg-green-500 animate-pulse"></div>}
         </div>
       </div>
     </div>

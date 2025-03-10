@@ -1,4 +1,3 @@
-
 import { useMemo, useState, useEffect } from 'react';
 import { ENGINE_MAX_RPM, REDLINE_RPM } from '@/lib/constants';
 
@@ -18,12 +17,10 @@ export function RPMGauge({ rpm, reachedRedline = false, gear = 0, isRunning = fa
     return Math.round(rpm).toLocaleString();
   }, [rpm]);
 
-  // Calculate percentage for the gauge animation
+  // Calculate percentage for the gauge animation with improved smoothing
   const gaugePercentage = useMemo(() => {
-    // Apply bounce effect at redline
     let adjustedPercentage = (rpm / ENGINE_MAX_RPM) * 100;
     
-    // Add bounce effect if at redline
     if (reachedRedline) {
       adjustedPercentage += bounceOffset;
     }
@@ -69,7 +66,7 @@ export function RPMGauge({ rpm, reachedRedline = false, gear = 0, isRunning = fa
   return (
     <div className="flex flex-col items-center w-full max-w-md">
       <div className="gauge-container relative w-60 h-60 rounded-full bg-gray-900/50 backdrop-blur-sm border border-gray-700 flex items-center justify-center overflow-hidden">
-        {/* Value display styled like the reference image */}
+        {/* Value display */}
         <div className="gauge-value text-center z-10">
           <span className={`text-4xl sm:text-5xl font-bold ${reachedRedline ? 'text-red-500' : 'text-white'}`}>
             {formattedRPM}
@@ -86,7 +83,7 @@ export function RPMGauge({ rpm, reachedRedline = false, gear = 0, isRunning = fa
           </div>
         )}
         
-        {/* Arc at the right side (now direction right-to-left) */}
+        {/* Arc with improved animation */}
         <div className="absolute top-0 right-0 w-full h-full">
           <svg width="100%" height="100%" viewBox="0 0 100 100">
             <path
@@ -98,12 +95,13 @@ export function RPMGauge({ rpm, reachedRedline = false, gear = 0, isRunning = fa
               style={{
                 strokeDasharray: '47.1',
                 strokeDashoffset: `${47.1 - (gaugePercentage / 100) * 47.1}`,
+                transition: 'stroke-dashoffset 300ms cubic-bezier(0.4, 0, 0.2, 1)',
               }}
             />
           </svg>
         </div>
         
-        {/* Gear indicator in place of D */}
+        {/* Gear indicator */}
         <div className="absolute bottom-10 left-1/2 -translate-x-1/2 bg-gray-800 rounded-full w-8 h-8 flex items-center justify-center border border-gray-700">
           {isRunning && (
             <span className="text-white font-bold">
