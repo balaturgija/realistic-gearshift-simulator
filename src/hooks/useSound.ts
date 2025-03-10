@@ -1,3 +1,4 @@
+
 import { useEffect, useState, useRef, useCallback } from 'react';
 import { SOUND_FILES, FREQUENCY_BANDS } from '@/lib/constants';
 
@@ -26,7 +27,7 @@ export function useSound({ isEngineRunning, rpm, maxRpm, gear, throttle }: UseSo
   // Track previous gear for sound effects
   const prevGearRef = useRef<number>(0);
 
-  // Load and decode sound
+  // Load and decode sound - ONLY engine sounds are retained
   const loadSound = useCallback(async (url: string): Promise<AudioBuffer | null> => {
     try {
       if (!audioContextRef.current) return null;
@@ -98,23 +99,8 @@ export function useSound({ isEngineRunning, rpm, maxRpm, gear, throttle }: UseSo
               data[i] = Math.random() * 0.02 * Math.exp(-(t - 0.3) * 5);
             }
           }
-        } else if (url.includes('shift')) {
-          // Gear shift sound - with transmission whine and clutch engagement
-          for (let i = 0; i < data.length; i++) {
-            const t = i / audioContextRef.current.sampleRate;
-            if (t < 0.05) {
-              // Clutch disengage
-              data[i] = Math.sin(800 * 2 * Math.PI * t) * 0.1 * (1 - t/0.05);
-            } else if (t < 0.1) {
-              // Gear engagement
-              data[i] = Math.sin(400 * 2 * Math.PI * t) * 0.15 + 
-                        (Math.random() * 0.1 - 0.05);
-            } else {
-              // Clutch reengagement
-              data[i] = Math.sin(600 * 2 * Math.PI * t) * 0.1 * Math.exp(-(t - 0.1) * 20);
-            }
-          }
         }
+        // Removed the gear shift sound generation
       }
       
       return buffer;
@@ -165,8 +151,8 @@ export function useSound({ isEngineRunning, rpm, maxRpm, gear, throttle }: UseSo
     }
   }, [loadSound]);
 
-  // Play a one-shot sound effect
-  const playSoundEffect = useCallback(async (type: 'start' | 'off' | 'shift') => {
+  // Play a one-shot sound effect - ONLY engine start/stop sounds are retained
+  const playSoundEffect = useCallback(async (type: 'start' | 'off') => {
     if (!audioContextRef.current) return;
     
     let soundUrl;
@@ -177,9 +163,8 @@ export function useSound({ isEngineRunning, rpm, maxRpm, gear, throttle }: UseSo
       case 'off':
         soundUrl = SOUND_FILES.engineOff;
         break;
-      case 'shift':
-        soundUrl = SOUND_FILES.gearShift;
-        break;
+      default:
+        return; // Only process engine sounds
     }
     
     const buffer = await loadSound(soundUrl);
@@ -189,7 +174,7 @@ export function useSound({ isEngineRunning, rpm, maxRpm, gear, throttle }: UseSo
       
       // Create a gain node to control volume
       const effectGain = audioContextRef.current.createGain();
-      effectGain.gain.value = type === 'shift' ? 0.2 : 0.7; // Lower volume for shift sounds
+      effectGain.gain.value = 0.7;
       
       source.connect(effectGain);
       effectGain.connect(audioContextRef.current.destination);
@@ -286,15 +271,12 @@ export function useSound({ isEngineRunning, rpm, maxRpm, gear, throttle }: UseSo
     }
   }, [isEngineRunning, rpm, maxRpm, gear, throttle]);
 
-  // Handle gear changes
+  // Handle gear changes - Removed the gear shift sound effect
   useEffect(() => {
     if (isEngineRunning && gear > 0 && gear !== prevGearRef.current) {
-      if (prevGearRef.current > 0) {
-        playSoundEffect('shift');
-      }
       prevGearRef.current = gear;
     }
-  }, [gear, isEngineRunning, playSoundEffect]);
+  }, [gear, isEngineRunning]);
 
   return { frequencies };
 }
