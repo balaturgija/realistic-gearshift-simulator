@@ -1,4 +1,3 @@
-
 import { useEngine } from '@/hooks/useEngine';
 import { useSound } from '@/hooks/useSound';
 import { RPMGauge } from './RPMGauge';
@@ -25,7 +24,7 @@ export function Dashboard() {
     toggleDyno
   } = useEngine();
 
-  const { audioParams } = useSound({
+  const { frequencies } = useSound({
     isEngineRunning: isRunning,
     rpm,
     maxRpm: ENGINE_MAX_RPM,
@@ -33,10 +32,8 @@ export function Dashboard() {
     throttle
   });
 
-  // State for throttle button
   const [throttleEnabled, setThrottleEnabled] = useState(false);
 
-  // Handle engine toggle
   const toggleEngine = () => {
     if (isRunning) {
       stopEngine();
@@ -45,7 +42,6 @@ export function Dashboard() {
     }
   };
 
-  // Handle throttle toggle
   const toggleThrottle = () => {
     setThrottleEnabled(prev => !prev);
     applyThrottle(throttleEnabled ? 0 : 0.8);
@@ -56,7 +52,6 @@ export function Dashboard() {
       <h1 className="text-2xl sm:text-4xl font-bold text-center mb-1 animate-fade-in">V8 Engine Simulator</h1>
       <p className="text-center text-dashboard-muted mb-4 text-sm sm:text-base animate-fade-in">Chevrolet 454 V8 7.4L (454 CI) Engine Experience</p>
       
-      {/* Dashboard - Main content takes most of the space */}
       <div className="grid grid-cols-1 md:grid-cols-2 gap-4 mb-4 flex-grow">
         <div className="dash-panel flex items-center justify-center">
           <SpeedGauge speed={speed} gear={gear} isRunning={isRunning} />
@@ -66,18 +61,15 @@ export function Dashboard() {
         </div>
       </div>
       
-      {/* Dynamometer - Only shown when enabled */}
       {isDynoEnabled && (
         <Dynamometer speed={speed} torque={torque} horsepower={horsepower} isRunning={isRunning} />
       )}
       
-      {/* Controls section - Repositioned for better layout */}
       <div className="grid grid-cols-1 md:grid-cols-3 gap-4 mt-auto">
         <div className="dash-panel flex flex-col">
           <h2 className="text-lg sm:text-xl font-semibold mb-4">Engine Controls</h2>
           
           <div className="engine-controls flex flex-col space-y-4">
-            {/* Start/Stop Toggle Button */}
             <div className="toggle-button-container">
               <label className="flex items-center cursor-pointer">
                 <div className="relative">
@@ -94,14 +86,12 @@ export function Dashboard() {
                   </div>
                 </div>
                 <span className="ml-4 text-white font-semibold">Engine Power</span>
-                {/* Green light indicator */}
                 {isRunning && (
                   <div className="ml-2 w-3 h-3 rounded-full bg-green-500 animate-pulse"></div>
                 )}
               </label>
             </div>
             
-            {/* Throttle Toggle Button */}
             <div className="toggle-button-container">
               <label className="flex items-center cursor-pointer">
                 <div className="relative">
@@ -122,7 +112,6 @@ export function Dashboard() {
               </label>
             </div>
             
-            {/* Dyno Toggle Button */}
             <div className="toggle-button-container">
               <label className="flex items-center cursor-pointer">
                 <div className="relative">
