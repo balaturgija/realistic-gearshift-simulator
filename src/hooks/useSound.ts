@@ -1,3 +1,4 @@
+
 import { useEffect, useState, useRef, useCallback } from 'react';
 import { SOUND_FILES, FREQUENCY_BANDS } from '@/lib/constants';
 
@@ -61,23 +62,22 @@ export function useSound({ isEngineRunning, rpm, maxRpm, gear, throttle }: UseSo
           for (let i = 0; i < data.length; i++) {
             const t = i / audioContextRef.current.sampleRate;
             if (t < 0.3) {
-              // Starter motor - smoother, less high frequency
-              data[i] = Math.sin(50 * 2 * Math.PI * t) * 0.25 * 
-                        (1 - Math.random() * 0.03);
+              // Starter motor - more consistent low rumble
+              data[i] = Math.sin(45 * 2 * Math.PI * t) * 0.2 * 
+                        (1 - Math.random() * 0.02);
             } else if (t < 0.6) {
-              // Ignition - reduced high frequencies
-              data[i] = Math.sin(35 * 2 * Math.PI * t) * 0.35 * 
-                        Math.sin(80 * t) +
-                        (Math.random() * 0.15 - 0.075);
+              // Ignition - constant frequency, no rise
+              data[i] = Math.sin(35 * 2 * Math.PI * t) * 0.3 * 
+                        Math.sin(40 * t) +
+                        (Math.random() * 0.1 - 0.05);
             } else {
-              // Engine catches - smoother transition, lower frequencies
-              const fade = Math.min(1, (t - 0.6) * 3);
-              // Reduced the max frequency rise to be more natural
-              const baseFreq = 40 + (t - 0.6) * 80; 
-              data[i] = Math.sin(baseFreq * 2 * Math.PI * t) * 0.3 * fade +
-                        Math.sin(baseFreq * 1.5 * 2 * Math.PI * t) * 0.2 * fade +
-                        Math.sin(baseFreq * 2.5 * 2 * Math.PI * t) * 0.08 * fade +
-                        (Math.random() * 0.04 - 0.02) * fade;
+              // Engine catches - constant frequencies, no rising pitch
+              const fade = Math.min(1, (t - 0.6) * 2);
+              // Using fixed frequencies instead of rising ones
+              data[i] = Math.sin(40 * 2 * Math.PI * t) * 0.3 * fade +
+                        Math.sin(60 * 2 * Math.PI * t) * 0.2 * fade +
+                        Math.sin(80 * 2 * Math.PI * t) * 0.05 * fade +
+                        (Math.random() * 0.03 - 0.015) * fade;
             }
           }
         } else if (url.includes('off')) {
@@ -270,7 +270,7 @@ export function useSound({ isEngineRunning, rpm, maxRpm, gear, throttle }: UseSo
     }
   }, [isEngineRunning, rpm, maxRpm, gear, throttle]);
 
-  // Handle gear changes - Completely removed the gear shift sound effect
+  // Handle gear changes
   useEffect(() => {
     if (isEngineRunning && gear !== prevGearRef.current) {
       prevGearRef.current = gear;
