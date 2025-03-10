@@ -10,7 +10,7 @@ export const GEAR_RATIOS = [0, 3.2, 2.3, 1.6, 1.2, 1.0, 0.8]; // Neutral + 6 gea
 export const MAX_TORQUE = 550; // Nm - for Chevrolet 454 V8
 export const MAX_POWER = 500; // HP - for Chevrolet 454 V8
 
-// Sound simulation - removed non-engine sounds
+// Sound simulation - engine sounds only
 export const SOUND_FILES = {
   idle: '/sounds/v8-idle.mp3',
   revving: '/sounds/v8-revving.mp3',
