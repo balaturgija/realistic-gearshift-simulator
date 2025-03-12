@@ -49,16 +49,55 @@ export function Dashboard() {
   };
 
   return (
-    <div className="container mx-auto h-screen flex flex-col px-2 sm:px-4 py-4">
+    <div className="container mx-auto px-2 sm:px-4 py-6 pb-20">
       <h1 className="text-2xl sm:text-4xl font-bold text-center mb-1 animate-fade-in">V8 Engine Simulator</h1>
-      <p className="text-center text-dashboard-muted mb-4 text-sm sm:text-base animate-fade-in">Chevrolet 454 V8 7.4L (454 CI) Engine Experience</p>
+      <p className="text-center text-dashboard-muted mb-6 text-sm sm:text-base animate-fade-in">Chevrolet 454 V8 7.4L (454 CI) Engine Experience</p>
       
-      <div className="grid grid-cols-1 md:grid-cols-2 gap-4 mb-4 flex-grow">
-        <div className="dash-panel flex items-center justify-center">
-          <SpeedGauge speed={speed} gear={gear} isRunning={isRunning} />
+      {/* Merged dashboard-style gauges container */}
+      <div className="dashboard-container relative mb-8 rounded-xl glass-panel p-4 sm:p-6 border-2 border-gray-800 shadow-lg">
+        {/* Dashboard design elements */}
+        <div className="absolute top-0 left-0 w-full h-6 bg-gray-800/50 rounded-t-xl border-b border-gray-700"></div>
+        <div className="absolute bottom-0 left-0 w-full h-3 bg-gray-900/60 rounded-b-xl"></div>
+        
+        {/* Dashboard label */}
+        <div className="relative z-10 flex justify-center mb-4">
+          <div className="bg-gray-800 px-6 py-1 rounded-full border border-gray-700 shadow-inner">
+            <span className="text-sm font-bold tracking-widest text-gray-300">ENGINE DASHBOARD</span>
+          </div>
         </div>
-        <div className="dash-panel flex items-center justify-center">
-          <RPMGauge rpm={rpm} reachedRedline={reachedRedline} gear={gear} isRunning={isRunning} />
+        
+        {/* Gauges container */}
+        <div className="grid grid-cols-1 md:grid-cols-2 gap-6 relative z-10 mt-6">
+          <div className="dash-panel flex items-center justify-center border-t-2 border-t-dashboard-gauge-needle/20">
+            <SpeedGauge speed={speed} gear={gear} isRunning={isRunning} />
+          </div>
+          <div className="dash-panel flex items-center justify-center border-t-2 border-t-dashboard-gauge-redline/20">
+            <RPMGauge rpm={rpm} reachedRedline={reachedRedline} gear={gear} isRunning={isRunning} />
+          </div>
+        </div>
+        
+        {/* Indicator lights/warnings */}
+        <div className="grid grid-cols-4 sm:grid-cols-5 gap-2 mt-6 mb-2">
+          <div className={`indicator-light ${isRunning ? 'bg-green-500/20' : 'bg-gray-700/30'} border ${isRunning ? 'border-green-500' : 'border-gray-600'}`}>
+            <span className="text-xs">ENGINE</span>
+            {isRunning && <div className="dot bg-green-500"></div>}
+          </div>
+          <div className={`indicator-light ${throttleEnabled ? 'bg-amber-500/20' : 'bg-gray-700/30'} border ${throttleEnabled ? 'border-amber-500' : 'border-gray-600'}`}>
+            <span className="text-xs">THROTTLE</span>
+            {throttleEnabled && <div className="dot bg-amber-500"></div>}
+          </div>
+          <div className={`indicator-light ${reachedRedline ? 'bg-red-500/20' : 'bg-gray-700/30'} border ${reachedRedline ? 'border-red-500' : 'border-gray-600'}`}>
+            <span className="text-xs">REDLINE</span>
+            {reachedRedline && <div className="dot bg-red-500"></div>}
+          </div>
+          <div className={`indicator-light ${isDynoEnabled ? 'bg-blue-500/20' : 'bg-gray-700/30'} border ${isDynoEnabled ? 'border-blue-500' : 'border-gray-600'}`}>
+            <span className="text-xs">DYNO</span>
+            {isDynoEnabled && <div className="dot bg-blue-500"></div>}
+          </div>
+          <div className="indicator-light bg-gray-700/30 border border-gray-600 sm:flex hidden">
+            <span className="text-xs">SYSTEM</span>
+            <div className="dot bg-teal-500"></div>
+          </div>
         </div>
       </div>
       
@@ -66,7 +105,7 @@ export function Dashboard() {
         <Dynamometer speed={speed} torque={torque} horsepower={horsepower} isRunning={isRunning} />
       )}
       
-      <div className="grid grid-cols-1 md:grid-cols-3 gap-4 mt-auto">
+      <div className="grid grid-cols-1 md:grid-cols-3 gap-4 mt-8">
         <div className="dash-panel flex flex-col">
           <h2 className="text-lg sm:text-xl font-semibold mb-4">Engine Controls</h2>
           
@@ -157,6 +196,11 @@ export function Dashboard() {
             </div>
           </div>
         </div>
+      </div>
+      
+      {/* Keyboard shortcut hints */}
+      <div className="mt-8 text-center text-sm text-dashboard-muted">
+        <p>Press <kbd className="px-2 py-1 bg-gray-800 rounded border border-gray-700 mx-1">L</kbd> to lock/unlock screen scrolling</p>
       </div>
     </div>
   );
