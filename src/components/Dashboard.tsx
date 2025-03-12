@@ -1,3 +1,4 @@
+
 import { useEngine } from '@/hooks/useEngine';
 import { useSound } from '@/hooks/useSound';
 import { RPMGauge } from './RPMGauge';
@@ -81,7 +82,7 @@ export function Dashboard() {
                   />
                   <div className={`flex h-12 w-28 items-center rounded-full p-1 transition duration-300 ${isRunning ? 'bg-green-900' : 'bg-gray-700'}`}>
                     <div className={`flex h-10 w-10 items-center justify-center rounded-full transition duration-300 transform ${isRunning ? 'translate-x-16 bg-green-500' : 'bg-gray-900'}`}>
-                      <span className="text-white text-lg">{isRunning ? "ON" : "OFF"}</span>
+                      <span className="text-white text-xs font-medium">{isRunning ? "ON" : "OFF"}</span>
                     </div>
                   </div>
                 </div>
@@ -104,7 +105,7 @@ export function Dashboard() {
                   />
                   <div className={`flex h-12 w-28 items-center rounded-full p-1 transition duration-300 ${throttleEnabled ? 'bg-amber-900' : 'bg-gray-700'} ${!isRunning ? 'opacity-50' : ''}`}>
                     <div className={`flex h-10 w-10 items-center justify-center rounded-full transition duration-300 transform ${throttleEnabled ? 'translate-x-16 bg-amber-500' : 'bg-gray-900'}`}>
-                      <span className="text-white text-lg">{throttleEnabled ? "ON" : "OFF"}</span>
+                      <span className="text-white text-xs font-medium">{throttleEnabled ? "ON" : "OFF"}</span>
                     </div>
                   </div>
                 </div>
@@ -123,7 +124,7 @@ export function Dashboard() {
                   />
                   <div className={`flex h-12 w-28 items-center rounded-full p-1 transition duration-300 ${isDynoEnabled ? 'bg-blue-900' : 'bg-gray-700'}`}>
                     <div className={`flex h-10 w-10 items-center justify-center rounded-full transition duration-300 transform ${isDynoEnabled ? 'translate-x-16 bg-blue-500' : 'bg-gray-900'}`}>
-                      <span className="text-white text-lg">{isDynoEnabled ? "ON" : "OFF"}</span>
+                      <span className="text-white text-xs font-medium">{isDynoEnabled ? "ON" : "OFF"}</span>
                     </div>
                   </div>
                 </div>
